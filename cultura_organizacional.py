@@ -88,7 +88,7 @@ with col1:
 with col2:
     st.markdown(f"""
     <div style="display: flex; flex-direction: column; justify-content: center; height: 100%;">
-        <h1 style='color: {COLOR_TEXT_DARK}; margin: 0; padding: 0;'>A - Inventário Organizacional</h1>
+        <h1 style='color: {COLOR_TEXT_DARK}; margin: 0; padding: 0;'>Inventário Organizacional</h1>
         <h3 style='color: {COLOR_TEXT_DARK}; margin: 0; padding: 0;'>Cultura e Prática</h3>
     </div>
     """, unsafe_allow_html=True)
@@ -109,9 +109,9 @@ with st.container(border=True):
 with st.expander("Ver Orientações aos Respondentes", expanded=True):
     st.info(
         """
-        - **Objetivo:** Avaliar dimensões da organização como regras, normas, reputação, valores e práticas[cite: 43].
+        - **Objetivo:** Avaliar dimensões da organização como regras, normas, reputação, valores e práticas.
         - **Escala Likert 1–5:** 1=Discordo totalmente, 2=Discordo parcialmente, 3=Neutro, 4=Concordo parcialmente, 5=Concordo totalmente.
-        - **Confidencialidade:** Responda de forma individual e espontânea. Suas respostas são confidenciais e contribuem para um ambiente de trabalho mais saudável[cite: 51, 53, 55].
+        - **Confidencialidade:** Responda de forma individual e espontânea. Suas respostas são confidenciais e contribuem para um ambiente de trabalho mais saudável.
         """
     )
 

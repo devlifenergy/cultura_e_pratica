@@ -176,7 +176,12 @@ def registrar_resposta(item_id, key):
     st.session_state.respostas[item_id] = st.session_state[key]
 
 for bloco in blocos:
-    with st.expander(f"Dimensão: {bloco}", expanded=True):
+    df_bloco = df_itens[df_itens["Bloco"] == bloco]
+    # Extrai o prefixo (sigla) a partir do ID do primeiro item do bloco
+    prefixo_bloco = df_bloco['ID'].iloc[0][:2] if not df_bloco.empty else bloco
+    
+    # Usa a sigla como título do expander
+    with st.expander(f"{prefixo_bloco}", expanded=True):
         df_bloco = df_itens[df_itens["Bloco"] == bloco]
         for _, row in df_bloco.iterrows():
             item_id = row["ID"]

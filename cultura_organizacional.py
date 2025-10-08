@@ -228,9 +228,16 @@ if st.button("Finalizar e Gerar Relatório", type="primary"):
         if not resumo_blocos.empty:
             st.subheader("Média por Dimensão")
             st.dataframe(resumo_blocos.rename(columns={"Bloco": "Dimensão"}), use_container_width=True, hide_index=True)
+            
             st.subheader("Gráfico Comparativo por Dimensão")
-            st.bar_chart(resumo_blocos.set_index("Bloco")["Média"])
-
+            
+            # Criação do gráfico de pizza com Matplotlib
+            fig, ax = plt.subplots()
+            ax.pie(resumo_blocos["Média"], labels=resumo_blocos["Bloco"], autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')  # Garante que a pizza seja um círculo.
+            
+            # Exibe o gráfico no Streamlit
+            st.pyplot(fig)
      # --- ADICIONAR ESTE TRECHO PARA ENVIO AO GOOGLE SHEETS ---
         with st.spinner("Enviando dados para a planilha..."):
             try:

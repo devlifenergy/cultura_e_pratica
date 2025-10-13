@@ -265,4 +265,10 @@ if st.button("Finalizar e Gerar Relatório", type="primary"):
 
             except Exception as e:
                 st.error(f"Erro ao enviar dados para a planilha: {e}")
-        # --- FIM DO TRECHO DE ENVIO ---
+
+                with st.container():
+                    st.markdown('<div id="autoclick-div">', unsafe_allow_html=True)
+                    if st.button("Ping Button", key="autoclick_button"):
+                    # A ação aqui pode ser um simples print no log do Streamlit
+                      print("Ping button clicked by automation.")
+                    st.markdown('</div>', unsafe_allow_html=True)

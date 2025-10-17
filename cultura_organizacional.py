@@ -77,27 +77,28 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-try:
-    # Cria uma cópia editável das credenciais
-    creds_dict = dict(st.secrets["google_credentials"])
-    # Corrige a formatação da chave privada
-    creds_dict['private_key'] = creds_dict['private_key'].replace('\\n', '\n')
-    
-    # Autentica no Google
-    gc = gspread.service_account_from_dict(creds_dict)
-    
-    # Abre a planilha pelo nome exato
-    spreadsheet = gc.open("Respostas Formularios")
-    
-    # Seleciona a primeira aba
-    worksheet = spreadsheet.sheet1
+@st.cache_resource
+def connect_to_gsheet():
+    """Conecta ao Google Sheets e retorna o objeto da aba de respostas."""
+    try:
+        creds_dict = dict(st.secrets["google_credentials"])
+        creds_dict['private_key'] = creds_dict['private_key'].replace('\\n', '\n')
+        
+        gc = gspread.service_account_from_dict(creds_dict)
+        spreadsheet = gc.open("Respostas Formularios")
+        
+        # Retorna apenas a aba principal
+        return spreadsheet.worksheet("Cultura")
+    except Exception as e:
+        st.error(f"Erro ao conectar com o Google Sheets: {e}")
+        return None
 
-except Exception as e:
-    st.error(f"Erro ao conectar com o Google Sheets: {e}")
+ws_respostas = connect_to_gsheet()
+
+if ws_respostas is None:
+    st.error("Não foi possível conectar à aba 'Cultura' da planilha. Verifique o nome e as permissões.")
     st.stop()
 
-# Seleciona as abas fora da função de cache
-ws_respostas = spreadsheet.worksheet("Cultura")
 
 # --- CABEÇALHO DA APLICAÇÃO ---
 col1, col2 = st.columns([1, 4])

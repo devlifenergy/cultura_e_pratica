@@ -211,34 +211,6 @@ if st.button("Finalizar e Gerar Relatório", type="primary"):
             })
         dfr = pd.DataFrame(respostas_list)
 
-        dfr_numerico = dfr[pd.to_numeric(dfr['Resposta'], errors='coerce').notna()].copy()
-        if not dfr_numerico.empty:
-            dfr_numerico['Resposta'] = dfr_numerico['Resposta'].astype(int)
-            def ajustar_reverso(row):
-                return (6 - row["Resposta"]) if row["Reverso"] == "SIM" else row["Resposta"]
-            dfr_numerico["Pontuação"] = dfr_numerico.apply(ajustar_reverso, axis=1)
-            media_geral = dfr_numerico["Pontuação"].mean()
-            resumo_blocos = dfr_numerico.groupby("Bloco")["Pontuação"].mean().round(2).reset_index(name="Média").sort_values("Média")
-        else:
-            media_geral = 0
-            resumo_blocos = pd.DataFrame(columns=["Bloco", "Média"])
-
-        st.metric("Pontuação Média Geral (somente itens de 1 a 5)", f"{media_geral:.2f}")
-
-        if not resumo_blocos.empty:
-            st.subheader("Média por Dimensão")
-            st.dataframe(resumo_blocos.rename(columns={"Bloco": "Dimensão"}), use_container_width=True, hide_index=True)
-            
-            st.subheader("Gráfico Comparativo por Dimensão")
-            
-            # Criação do gráfico de pizza com Matplotlib
-            fig, ax = plt.subplots()
-            ax.pie(resumo_blocos["Média"], labels=resumo_blocos["Bloco"], autopct='%1.1f%%', startangle=90)
-            ax.axis('equal')  # Garante que a pizza seja um círculo.
-            
-            # Exibe o gráfico no Streamlit
-            st.pyplot(fig)
-     # --- ADICIONAR ESTE TRECHO PARA ENVIO AO GOOGLE SHEETS ---
         with st.spinner("Enviando dados para a planilha..."):
             try:
                 # 1. Preparar dados para o envio
@@ -266,9 +238,9 @@ if st.button("Finalizar e Gerar Relatório", type="primary"):
             except Exception as e:
                 st.error(f"Erro ao enviar dados para a planilha: {e}")
 
-                with st.container():
-                    st.markdown('<div id="autoclick-div">', unsafe_allow_html=True)
-                    if st.button("Ping Button", key="autoclick_button"):
-                    # A ação aqui pode ser um simples print no log do Streamlit
-                      print("Ping button clicked by automation.")
-                    st.markdown('</div>', unsafe_allow_html=True)
+        with st.empty():
+            st.markdown('<div id="autoclick-div">', unsafe_allow_html=True)
+            if st.button("Ping Button", key="autoclick_button"):
+            # A ação aqui pode ser um simples print no log do Streamlit
+                print("Ping button clicked by automation.")
+            st.markdown('</div>', unsafe_allow_html=True)

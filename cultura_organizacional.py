@@ -3,6 +3,9 @@ import pandas as pd
 from datetime import datetime
 import gspread
 from gspread_dataframe import set_with_dataframe
+import urllib.parse
+import hmac
+import hashlib
 # --- PALETA DE CORES E CONFIGURAÇÃO DA PÁGINA ---
 COLOR_PRIMARY = "#70D1C6" # Cor da logo Wedja
 COLOR_TEXT_DARK = "#333333"
@@ -119,13 +122,41 @@ with col2:
 # --- SEÇÃO DE IDENTIFICAÇÃO ---
 with st.container(border=True):
     st.markdown("<h3 style='text-align: center;'>Identificação</h3>", unsafe_allow_html=True)
+    
+# --- Lógica de Verificação da URL ---
+    org_coletora_valida = "Instituto Wedja de Socionomia" # Valor padrão seguro
+    try:
+        query_params = st.query_params
+        org_encoded_from_url = query_params.get("org")
+        sig_from_url = query_params.get("sig")
+        
+        if org_encoded_from_url and sig_from_url:
+            org_decoded = urllib.parse.unquote(org_encoded_from_url)
+            
+            # Recalcula a assinatura
+            secret_key = st.secrets["LINK_SECRET_KEY"].encode('utf-8')
+            message = org_decoded.encode('utf-8')
+            calculated_sig = hmac.new(secret_key, message, hashlib.sha256).hexdigest()
+            
+            # Compara as assinaturas de forma segura
+            if hmac.compare_digest(calculated_sig, sig_from_url):
+                org_coletora_valida = org_decoded # Assinatura válida, usa o nome da URL
+            else:
+                st.warning("Link inválido ou adulterado. Usando organização padrão.")
+        # Se 'org' ou 'sig' não estiverem na URL, usa o valor padrão
+        
+    except Exception as e:
+        st.error(f"Erro ao processar parâmetros da URL: {e}")
+        # Mantém o valor padrão em caso de erro
+    # --- Fim da Lógica de Verificação ---
+
     col1_form, col2_form = st.columns(2)
     with col1_form:
         respondente = st.text_input("Respondente:", key="input_respondente")
-        data = st.text_input("Data:", datetime.now().strftime('%d/%m/%Y'))
+        # Usa o valor validado ou padrão
+        organizacao_coletora = st.text_input("Organização Coletora:", value=org_coletora_valida, disabled=True) 
     with col2_form:
-        organizacao_coletora = st.text_input("Organização Coletora:", "Instituto Wedja de Socionomia", disabled=True)
-
+        data = st.text_input("Data:", datetime.now().strftime('%d/%m/%Y')) # Ajustado nome da variável
 
 # --- INSTRUÇÕES ---
 with st.expander("Ver Orientações aos Respondentes", expanded=True):
@@ -238,7 +269,7 @@ if st.button("Finalizar e Enviar Respostas", type="primary", disabled=botao_desa
                         timestamp_str,
                         respondente,
                         data,
-                        organizacao_coletora,
+                        org_coletora_valida,
                         row["Bloco"],
                         row["Item"],
                         row["Resposta"] if pd.notna(row["Resposta"]) else "N/A",

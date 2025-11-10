@@ -194,7 +194,7 @@ def carregar_itens():
         ('Práticas Informais', 'PI03', 'Os relacionamentos pessoais influenciam fortemente decisões internas.', 'NÃO'),
         ('Práticas Informais', 'PI04', 'Existem redes de apoio informais entre os colaboradores (amizades, grupos, trocas).', 'NÃO'),
     ]
-    df = pd.DataFrame(data, columns=["Bloco", "ID", "Item", "Reverso"])
+    df = pd.DataFrame(data, columns=["Dimensão", "ID", "Item", "Reverso"])
     return df
 
 # --- INICIALIZAÇÃO E FORMULÁRIO DINÂMICO ---
@@ -203,18 +203,18 @@ if 'respostas' not in st.session_state:
     st.session_state.respostas = {}
 
 st.subheader("Questionário")
-blocos = df_itens["Bloco"].unique().tolist()
+blocos = df_itens["Dimensão"].unique().tolist()
 def registrar_resposta(item_id, key):
     st.session_state.respostas[item_id] = st.session_state[key]
 
 for bloco in blocos:
-    df_bloco = df_itens[df_itens["Bloco"] == bloco]
+    df_bloco = df_itens[df_itens["Dimensão"] == bloco]
     # Extrai o prefixo (sigla) a partir do ID do primeiro item do bloco
     prefixo_bloco = df_bloco['ID'].iloc[0][:2] if not df_bloco.empty else bloco
     
     # Usa a sigla como título do expander
     with st.expander(f"{prefixo_bloco}", expanded=True):
-        df_bloco = df_itens[df_itens["Bloco"] == bloco]
+        df_bloco = df_itens[df_itens["Dimensão"] == bloco]
         for _, row in df_bloco.iterrows():
             item_id = row["ID"]
             label = f'({item_id}) {row["Item"]}'
@@ -252,7 +252,7 @@ if st.button("Finalizar e Enviar Respostas", type="primary", disabled=botao_desa
             item_id = row['ID']
             resposta_usuario = st.session_state.respostas.get(item_id)
             respostas_list.append({
-                "Bloco": row["Bloco"], "Item": row["Item"],
+                "Dimensão": row["Dimensão"], "Item": row["Item"],
                 "Resposta": resposta_usuario, "Reverso": row["Reverso"]
             })
         dfr = pd.DataFrame(respostas_list)
@@ -268,9 +268,8 @@ if st.button("Finalizar e Enviar Respostas", type="primary", disabled=botao_desa
                     respostas_para_enviar.append([
                         timestamp_str,
                         respondente,
-                        data,
                         org_coletora_valida,
-                        row["Bloco"],
+                        row["Dimensão"],
                         row["Item"],
                         row["Resposta"] if pd.notna(row["Resposta"]) else "N/A",
                         #observacoes # Adiciona as observações em cada linha

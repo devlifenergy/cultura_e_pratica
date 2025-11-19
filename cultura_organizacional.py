@@ -292,12 +292,17 @@ else:
                 try:
                     # 1. Preparar dados para o envio
                     timestamp_str = datetime.now().isoformat(timespec="seconds")
+
+                    nome_limpo = organizacao_coletora.strip().upper()
+                    id_organizacao = hashlib.md5(nome_limpo.encode('utf-8')).hexdigest()[:8].upper()
+
                     respostas_para_enviar = []
                     
                     # O DataFrame 'dfr' já foi criado na seção de cálculo
                     for _, row in dfr.iterrows():
                         respostas_para_enviar.append([
                             timestamp_str,
+                            id_organizacao,
                             respondente,
                             org_coletora_valida,
                             row["Dimensão"],

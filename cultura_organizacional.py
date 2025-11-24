@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import gspread
-from gspread_dataframe import set_with_dataframe
 import urllib.parse
 import hmac
 import hashlib
@@ -118,11 +117,6 @@ with col2:
     </div>
     """, unsafe_allow_html=True)
 
-
-# --- SEÇÃO DE IDENTIFICAÇÃO ---
-with st.container(border=True):
-    st.markdown("<h3 style='text-align: center;'>Identificação</h3>", unsafe_allow_html=True)
-    
 # --- Lógica de Verificação da URL ---
     org_coletora_valida = "Instituto Wedja de Socionomia" # Valor padrão seguro
     link_valido = False # Começa como inválido por padrão
@@ -318,6 +312,7 @@ else:
                             timestamp_str,
                             id_organizacao,
                             respondente,
+                            data,
                             org_coletora_valida,
                             row["Dimensão"],
                             row["Item"],
